@@ -25,6 +25,7 @@ def runBFS():
     parameters = request.get_json()
     json_graph = parameters['graph']
     start = parameters['start']
+    robotGroup = parameters['robotGroup']
 
     graph = {}
     for key in json_graph:
