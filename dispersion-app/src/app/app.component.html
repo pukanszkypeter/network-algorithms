@@ -5,7 +5,8 @@
     <img id="logo" src="assets/logo.png"/>
     <h1>
       Dispersion App
-      <div class="custom-border-bottom"></div>
+      <div class="custom-border-bottom" *ngIf="!loading"></div>
+      <mat-progress-bar mode="query" *ngIf="loading"></mat-progress-bar>
     </h1>
   </div>
 
@@ -16,27 +17,27 @@
       <mat-card class="operator-container shadow-lg">
 
         <div class="button-container">
-          <button mat-fab>
+          <button mat-fab matTooltip="Next">
             <mat-icon svgIcon="next"></mat-icon>
           </button>
         </div>
         <div class="button-container">
-          <button mat-fab>
+          <button mat-fab matTooltip="Play">
             <mat-icon svgIcon="play"></mat-icon>
           </button>
         </div>
         <div class="button-container">
-          <button mat-fab>
+          <button mat-fab matTooltip="Pause">
             <mat-icon svgIcon="pause"></mat-icon>
           </button>
         </div>
         <div class="button-container">
-          <button mat-fab>
+          <button mat-fab matTooltip="Reset">
             <mat-icon svgIcon="reset"></mat-icon>
           </button>
         </div>
         <div class="button-container">
-          <button mat-fab>
+          <button mat-fab matTooltip="Configure" (click)="configureNetwork()">
             <mat-icon svgIcon="settings"></mat-icon>
           </button>
         </div>

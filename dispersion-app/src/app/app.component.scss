@@ -26,6 +26,12 @@
             margin-left: 20px;
             opacity: 95%;
         }
+
+        .mat-progress-bar {
+            width: 50%;
+            margin-top: 5px;
+            margin-left: 20px;
+        }
     }
 
 }
@@ -65,7 +71,6 @@
     height: 80vh;
     border-radius: 20px;
     background-color: rgb(56,56,56,.87);
-
 }
 
 .custom-panel {

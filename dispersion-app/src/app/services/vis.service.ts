@@ -33,19 +33,19 @@ export class VisService {
       // Node
       const index = this.nodes.findIndex(node => node.id === Number(chunk[0]));
       if (index === -1){
-        this.nodes.push({id: Number(chunk[0]), fixed: false, label: chunk[0]});
+        this.nodes.push({id: Number(chunk[0]), fixed: false, color: '#673AB7'});
       }
 
       // Edges
       const toValues = chunk[1].split(',');
       for (let to of toValues) {
         if(!this.isDuplicatedEdge(chunk[0], to, this.edges)) {
-          this.edges.push({id: edgeID, from: Number(chunk[0]), to: Number(to)});
+          this.edges.push({id: edgeID, from: Number(chunk[0]), to: Number(to), color: '#673AB7'});
           edgeID++;
         }
       }
     }
-    
+
     return {nodes: new DataSet(this.nodes), edges: new DataSet(this.edges)};
   }
 

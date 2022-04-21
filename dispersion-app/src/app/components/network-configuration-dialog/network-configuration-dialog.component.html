@@ -1,0 +1,28 @@
+<h2 mat-dialog-title>Network configuration</h2>
+<mat-dialog-content>
+    <form [formGroup]="networkConfiguration">
+        <mat-form-field appearance="standard">
+            <mat-label>{{ 'Network type' }}</mat-label>
+            <mat-select [formControl]="networkType">
+                <mat-option *ngFor="let networkType of networkTypes" [value]="networkType.value">
+                  {{ networkType.printValue }}
+                </mat-option>
+            </mat-select>
+            <mat-error *ngIf="networkType.hasError('required')">{{ 'This field is required!' }}</mat-error>
+        </mat-form-field>
+        <mat-form-field appearance="standard">
+            <mat-label>{{ 'Number of nodes' }}</mat-label>
+            <input matInput type="number" [formControl]="nodes" min="1" max="1000">
+            <mat-error *ngIf="nodes.hasError('required')">{{ 'This field is required!' }}</mat-error>
+            <mat-error *ngIf="nodes.hasError('min')">{{ 'The min value is 1!' }}</mat-error>
+            <mat-error *ngIf="nodes.hasError('max')">{{ 'The max value is 1000!' }}</mat-error>
+            <mat-error *ngIf="nodes.hasError('barbellConstraintError')">{{ 'The number must be divisible by three!' }}</mat-error>
+            <mat-error *ngIf="nodes.hasError('lollipopConstraintError')"> {{ 'The number must be divisible by two!' }}</mat-error>
+            <mat-error *ngIf="nodes.hasError('hypercubeConstraintError')">{{ 'The number must be a power of 2!' }}</mat-error>
+        </mat-form-field>
+    </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+    <button mat-raised-button color="primary" class="create-button" [disabled]="!networkConfiguration.valid" (click)="create()">Create</button>
+    <button mat-raised-button class="close-button" [mat-dialog-close]>Close</button>
+</mat-dialog-actions>

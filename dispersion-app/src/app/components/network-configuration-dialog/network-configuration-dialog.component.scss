@@ -1,0 +1,32 @@
+::ng-deep .mat-dialog-container {
+    background-color: rgb(56,56,56,.87) !important;
+
+    h2 {
+        color: #FFFFFF;
+    }
+
+    .mat-form-field {
+        width: 100%;
+
+        mat-label {
+            color: #FFFFFF;
+        }
+
+        .mat-select-value {
+            color: #FFFFFF;
+        }
+
+        input {
+            color: #FFFFFF;
+        }
+    }
+
+    .create-button {
+        color: #FFFFFF;
+    }
+
+    .close-button {
+        background-color: rgb(80,80,80);
+        color: #FFFFFF;
+    }
+}
