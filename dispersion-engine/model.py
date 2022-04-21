@@ -77,7 +77,7 @@ class Robot:
         
         self.routeMemory = []
         self.parent = None
-        self.child = None
+        self.child = 0
         self.settled = False
         self.treelabel = ""
     
@@ -118,7 +118,7 @@ class RobotGroup:
         
         availablePorts = graph.getNodePorts(self.nodeID)
 
-        print("NODE: " + str(self.nodeID) + " PATHS: " + str([a.id for a in availablePorts]))
+        print("--------NODE: " + str(self.nodeID) + " PATHS: " + str([a.id for a in availablePorts]))
 
         oldparent = None
         
@@ -133,44 +133,44 @@ class RobotGroup:
             oldparent = settledRobot.parent
             settledRobot.parent = self.settler.parent
 
-        portId = 0
+        portId = self.getRobot(self.getRobotOnNode()).child
         
         if settledRobot.parent == None:
             settledRobot.parent = availablePorts[0].id
-            return availablePorts[0].id
+            return (availablePorts[0].id, True)
         else:
             while portId < len(availablePorts):
                 print("while: " + str(portId) + " VS " + str(settledRobot.parent))
                 if settledRobot.parent >= portId:
-                    print("add: " + str(portId + 1))
                     portId += 1
                 else:
                     break
-            if len(availablePorts) == portId:
+            if len(availablePorts) <= portId:
                 print("BACKTRACK! " + str(settledRobot.parent) + " ID:_ " + str(settledRobot.id))
-                return availablePorts[oldparent].id
+                return (availablePorts[oldparent].id, False)
             print("FORWARD: " + str(availablePorts[portId].id))
-            return availablePorts[portId].id
+            return (availablePorts[portId].id, True)
+            
         #if portId <= len(availablePorts):
         #    if (portId + 1) != self.settler.parent and (portId + 1) <= len(availablePorts):
         #        portId += 1
         #    else:
         #        portId += 2
 
-    def move(self, edgeId, graph):                    # <-portA----------------
+    def move(self, edgeId, graph, forwardCase):                    # <-portA----------------
         #self.settler.settle(edge.portA.fromID)     # toID-----EDGE----fromID
         #self.settler.child = edge.portA            # ----------------portB->
         #self.nodeID = edge.portA.toID
-        print("hi")
-        print(edgeId)
         choosenRoute = graph.getEdge(edgeId)
 
         if choosenRoute.fromID == self.nodeID:
-            self.getSettler().parent = graph.getPortNumber(choosenRoute.toID, choosenRoute.id)
+            if forwardCase or self.getSettler().parent == None:
+                self.getSettler().parent = graph.getPortNumber(choosenRoute.toID, choosenRoute.id)
             self.getSettler().child = graph.getPortNumber(choosenRoute.fromID, choosenRoute.id)
             self.nodeID = choosenRoute.toID
         else:
-            self.getSettler().parent = graph.getPortNumber(choosenRoute.fromID, choosenRoute.id)
+            if forwardCase or self.getSettler().parent == None:
+                self.getSettler().parent = graph.getPortNumber(choosenRoute.fromID, choosenRoute.id)
             self.getSettler().child = graph.getPortNumber(choosenRoute.toID, choosenRoute.id)
             self.nodeID = choosenRoute.fromID
         
