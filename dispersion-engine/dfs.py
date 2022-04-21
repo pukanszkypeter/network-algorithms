@@ -87,7 +87,12 @@ graph = Graph(nodes, edges)
 
 for n in graph.nodes:
     n.initEdges([x for x in graph.edges if x.fromID == n.id or x.toID == n.id])
+'''
+for n in graph.nodes:
+    for e in graph.getNodePorts(n.id):
+        print("NODE: " + str(n.id) + "EDGE: " + str(e.id) + " PORTJA: " + str(graph.getPortNumber(n.id,e.id)))
 
+'''
 
 state = None
 state = dfs_steps(graph, 1, state, 5 )

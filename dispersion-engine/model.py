@@ -89,7 +89,19 @@ class RobotGroup:
     def __init__(self, robots, nodeID):
         self.robots = robots
         self.nodeID = nodeID
-        self.settler = None 
+        self.settler = None
+
+    def getRobotOnNode(self):
+        for i in list(filter(lambda x : x.settled == True, self.robots)):
+            if i.routeMemory[0] == self.nodeID:
+                return i.id
+        return -1
+
+    def getRobot(self, id):
+        for r in self.robots:
+            if r.id == id:
+                return r
+        return None
 
     def getSettler(self):
         firstRobot = self.robots[0]
@@ -106,35 +118,44 @@ class RobotGroup:
         
         availablePorts = graph.getNodePorts(self.nodeID)
 
-        print("compute: " + str([a.id for a in availablePorts]))
+        print("NODE: " + str(self.nodeID) + " PATHS: " + str([a.id for a in availablePorts]))
+
+        oldparent = None
         
-        usedNode = False
-
-        for i in list(filter(lambda x : x.settled == True, self.robots)):
-            if i.routeMemory[0] == self.nodeID:
-                usedNode = True
-
-        if not usedNode:
+        if -1 == self.getRobotOnNode():
+            print("LETELEPEDEK :) " + str(self.settler.id) + " itt: " + str(self.nodeID))
             self.settler.settle(self.nodeID)
+            settledRobot = self.settler
+            oldparent = settledRobot.parent
+        else:
+            settledRobot = self.getRobot(self.getRobotOnNode())
+            print("ŐT AKAROM NÖVELNI: " + str(settledRobot.id) + " | " + str(settledRobot.parent) + " | " + str(self.settler.parent))
+            oldparent = settledRobot.parent
+            settledRobot.parent = self.settler.parent
 
         portId = 0
         
-        if self.settler.parent == None:
-            self.settler.parent = availablePorts[0].id
+        if settledRobot.parent == None:
+            settledRobot.parent = availablePorts[0].id
             return availablePorts[0].id
         else:
             while portId < len(availablePorts):
-                print("while: " + str(portId) + " VS " + str(self.settler.parent))
-                if self.settler.parent >= portId:
+                print("while: " + str(portId) + " VS " + str(settledRobot.parent))
+                if settledRobot.parent >= portId:
                     print("add: " + str(portId + 1))
                     portId += 1
                 else:
                     break
-            print("len(availablePorts): " + str(len(availablePorts)) + " VS " + str(portId))
             if len(availablePorts) == portId:
-                return self.settler.parent
-            print("ELSE: " + str(availablePorts[portId].id))
+                print("BACKTRACK! " + str(settledRobot.parent) + " ID:_ " + str(settledRobot.id))
+                return availablePorts[oldparent].id
+            print("FORWARD: " + str(availablePorts[portId].id))
             return availablePorts[portId].id
+        #if portId <= len(availablePorts):
+        #    if (portId + 1) != self.settler.parent and (portId + 1) <= len(availablePorts):
+        #        portId += 1
+        #    else:
+        #        portId += 2
 
     def move(self, edgeId, graph):                    # <-portA----------------
         #self.settler.settle(edge.portA.fromID)     # toID-----EDGE----fromID
@@ -146,9 +167,11 @@ class RobotGroup:
 
         if choosenRoute.fromID == self.nodeID:
             self.getSettler().parent = graph.getPortNumber(choosenRoute.toID, choosenRoute.id)
+            self.getSettler().child = graph.getPortNumber(choosenRoute.fromID, choosenRoute.id)
             self.nodeID = choosenRoute.toID
         else:
             self.getSettler().parent = graph.getPortNumber(choosenRoute.fromID, choosenRoute.id)
+            self.getSettler().child = graph.getPortNumber(choosenRoute.toID, choosenRoute.id)
             self.nodeID = choosenRoute.fromID
         
         if len(list(filter(lambda x : x.settled == False, self.robots))) == 0:
