@@ -22,8 +22,8 @@ def communicate(robotGroup):
 def compute(robotGroup, graph):
     return robotGroup.compute(graph)
 
-def move(robotGroup, smallestPort, graph, forwardCase):
-    return robotGroup.move(smallestPort, graph, forwardCase)
+def move(robotGroup, smallestPort, graph):
+    return robotGroup.move(smallestPort, graph)
 
 def dfs_steps(graph, start, robotGroup, robotSize):
 
@@ -35,7 +35,7 @@ def dfs_steps(graph, start, robotGroup, robotSize):
     
     smallestPort = compute(robotGroup, graph)
  
-    return move(robotGroup, smallestPort[0], graph, smallestPort[1])
+    return move(robotGroup, smallestPort, graph)
 
 
 

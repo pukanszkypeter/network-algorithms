@@ -90,6 +90,7 @@ class RobotGroup:
         self.robots = robots
         self.nodeID = nodeID
         self.settler = None
+        self.forwardState = True
 
     def getRobotOnNode(self):
         for i in list(filter(lambda x : x.settled == True, self.robots)):
@@ -118,67 +119,74 @@ class RobotGroup:
         
         availablePorts = graph.getNodePorts(self.nodeID)
 
-        print("--------NODE: " + str(self.nodeID) + " PATHS: " + str([a.id for a in availablePorts]))
+        print("--------NODE: [[ " + str(self.nodeID) + " ]] PATHS: " + str([a.id for a in availablePorts]))
 
         oldparent = None
         
         if -1 == self.getRobotOnNode():
-            print("LETELEPEDEK :) " + str(self.settler.id) + " itt: " + str(self.nodeID))
+            print("LETELEPEDEK :) " + str(self.settler.id) + " itt: " + str(self.nodeID) + " INNEN JÖTTEM: " + str(self.settler.parent))
             self.settler.settle(self.nodeID)
             settledRobot = self.settler
             oldparent = settledRobot.parent
         else:
             settledRobot = self.getRobot(self.getRobotOnNode())
-            print("ŐT AKAROM NÖVELNI: " + str(settledRobot.id) + " | " + str(settledRobot.parent) + " | " + str(self.settler.parent))
-            oldparent = settledRobot.parent
-            settledRobot.parent = self.settler.parent
+            print("ŐT VAN ITT: " + str(settledRobot.id) + " PARENT: " +  str(settledRobot.parent) + " CHILD: " + str(settledRobot.child))
+            oldparent = settledRobot.child #ez a +1 nemtom miért kell, de ha nincs itt, akkor nem jó :)
+            if self.forwardState:
+                settledRobot.parent = self.settler.parent
 
-        portId = self.getRobot(self.getRobotOnNode()).child
+        portId = oldparent
         
         if settledRobot.parent == None:
             settledRobot.parent = availablePorts[0].id
-            return (availablePorts[0].id, True)
+            return availablePorts[0].id
         else:
             while portId < len(availablePorts):
-                print("while: " + str(portId) + " VS " + str(settledRobot.parent))
-                if settledRobot.parent >= portId:
-                    portId += 1
+                print("while: " + str(portId) + " VS " + str(settledRobot.parent) + " | " + str(settledRobot.child))
+                if self.forwardState == False:
+                    if settledRobot.child >= portId:
+                        portId += 1
+                    else:
+                        break
                 else:
-                    break
+                    if settledRobot.parent >= portId:
+                        portId += 1
+                    else:
+                        break
+                #if (self.forwardState == False and settledRobot.child >= portId) or settledRobot.parent >= portId:
+                #    portId += 1
+                #else:
+                #    break
             if len(availablePorts) <= portId:
                 print("BACKTRACK! " + str(settledRobot.parent) + " ID:_ " + str(settledRobot.id))
-                return (availablePorts[oldparent].id, False)
+                self.forwardState = False
+                settledRobot.child = settledRobot.parent
+                return availablePorts[settledRobot.parent].id
             print("FORWARD: " + str(availablePorts[portId].id))
-            return (availablePorts[portId].id, True)
-            
-        #if portId <= len(availablePorts):
-        #    if (portId + 1) != self.settler.parent and (portId + 1) <= len(availablePorts):
-        #        portId += 1
-        #    else:
-        #        portId += 2
+            self.forwardState = True
+            settledRobot.child = portId
+            return availablePorts[portId].id
 
-    def move(self, edgeId, graph, forwardCase):                    # <-portA----------------
-        #self.settler.settle(edge.portA.fromID)     # toID-----EDGE----fromID
-        #self.settler.child = edge.portA            # ----------------portB->
-        #self.nodeID = edge.portA.toID
+    def move(self, edgeId, graph):
         choosenRoute = graph.getEdge(edgeId)
 
         if choosenRoute.fromID == self.nodeID:
-            if forwardCase or self.getSettler().parent == None:
+            if self.forwardState or self.getSettler().parent == None:
                 self.getSettler().parent = graph.getPortNumber(choosenRoute.toID, choosenRoute.id)
-            self.getSettler().child = graph.getPortNumber(choosenRoute.fromID, choosenRoute.id)
+                print(str(self.getSettler().id) + " BEÁLLÍTOM A PARENTET: " + str(self.getSettler().parent) + " | " + str(self.getSettler().child))
+            #self.getSettler().child = graph.getPortNumber(choosenRoute.fromID, choosenRoute.id)
             self.nodeID = choosenRoute.toID
         else:
-            if forwardCase or self.getSettler().parent == None:
+            if self.forwardState or self.getSettler().parent == None:
                 self.getSettler().parent = graph.getPortNumber(choosenRoute.fromID, choosenRoute.id)
-            self.getSettler().child = graph.getPortNumber(choosenRoute.toID, choosenRoute.id)
+                print(str(self.getSettler().id) + "BEÁLLÍTOM A PARENTET: " + str(self.getSettler().parent))
+            #self.getSettler().child = graph.getPortNumber(choosenRoute.toID, choosenRoute.id)
             self.nodeID = choosenRoute.fromID
         
         if len(list(filter(lambda x : x.settled == False, self.robots))) == 0:
             print("Sikeres lefutás! :)")
             return None
 
-        #self.settler.parent = edge.portB
         return self
         
     def toJSON(self):
