@@ -20,6 +20,18 @@
             <mat-error *ngIf="nodes.hasError('lollipopConstraintError')"> {{ 'The number must be divisible by two!' }}</mat-error>
             <mat-error *ngIf="nodes.hasError('hypercubeConstraintError')">{{ 'The number must be a power of 2!' }}</mat-error>
         </mat-form-field>
+        <mat-form-field appearance="standard">
+            <mat-label>{{ 'Number of robots' }}</mat-label>
+            <input matInput type="number" [formControl]="robots">
+            <mat-error *ngIf="robots.hasError('required')">{{ 'This field is required!' }}</mat-error>
+            <mat-error *ngIf="robots.hasError('min')">{{ 'The min value is always the number of nodes!' }}</mat-error>
+            <mat-error *ngIf="robots.hasError('max')">{{ 'The max value is 1000!' }}</mat-error>
+        </mat-form-field>
+        <p class="start-node-label">Select start node:</p>
+        <mat-radio-group [formControl]="startNode">
+            <mat-radio-button color="primary" value="RANDOM">Random</mat-radio-button>
+            <mat-radio-button color="primary" value="MANUAL">Manually</mat-radio-button>
+        </mat-radio-group>
     </form>
 </mat-dialog-content>
 <mat-dialog-actions align="end">

@@ -11,6 +11,8 @@ import { MatOptionModule  } from '@angular/material/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatSliderModule } from '@angular/material/slider';
 
 @NgModule({
   declarations: [],
@@ -26,7 +28,9 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     MatOptionModule,
     MatSelectModule,
     MatProgressSpinnerModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatRadioModule,
+    MatSliderModule
   ]
 })
 export class MaterialModule { }

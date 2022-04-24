@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { EventEmitter, Injectable, Output } from '@angular/core';
 import * as vis from 'vis-network';
 import { DataSet } from "vis-data/peer/esm/vis-data";
 import { VisEdge, VisNode } from 'vis-network/declarations/network/gephiParser';
@@ -8,15 +8,47 @@ import { VisEdge, VisNode } from 'vis-network/declarations/network/gephiParser';
 })
 export class VisService {
 
+  @Output() ready: EventEmitter<any> = new EventEmitter();
+
   network: vis.Network | undefined;
 
   nodes: VisNode[] = [];
   edges: VisEdge[] = [];
 
+  startNodeID = 0;
+
   constructor() { }
 
-  public createNetwork(network: string, container: HTMLElement, options: any): void {
-    this.network = new vis.Network(container, this.initalizeData(network), options);
+  public createNetwork(network: string, container: HTMLElement, startNode: string): void {
+    this.network = new vis.Network(container, this.initalizeData(network), {
+      nodes: {
+        shape: "dot",
+        borderWidth: 2,
+        shadow: true,
+      },
+      edges: {
+        width: 2,
+        shadow: true,
+      },
+      physics: false,
+      interaction: {
+        hideEdgesOnDrag: true,
+        hideEdgesOnZoom: true,
+      },
+    });
+
+    if (startNode === 'RANDOM') {
+      const randomID = Math.floor(Math.random() * this.nodes.length) + 1;
+      this.selectStartNode(randomID);
+      this.ready.emit();
+    } else {
+      this.network.on("selectNode",  (params) => {
+        if (this.startNodeID === 0) {
+          this.selectStartNode(params.nodes[0]);
+          this.ready.emit();
+        }
+      });
+    }
   }
 
   private initalizeData(network: string): any {
@@ -51,6 +83,12 @@ export class VisService {
 
   private isDuplicatedEdge(from: string, to: string, edges: VisEdge[]): boolean {
     return !!edges.find(value => value.from === Number(to) && value.to === Number(from));
+  }
+
+  private selectStartNode(nodeID: number): void {
+    let nodes = (this.network as any).nodesHandler.body.data.nodes;
+    nodes.update({id: this.nodes[nodeID - 1].id, fixed: false, color: '#FF0000'});
+    this.startNodeID = nodeID;
   }
 
 }

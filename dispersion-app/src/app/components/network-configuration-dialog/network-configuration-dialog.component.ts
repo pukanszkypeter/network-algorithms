@@ -18,11 +18,20 @@ export class NetworkConfigurationDialogComponent implements OnInit {
 
     this.networkConfiguration = new FormGroup({
       networkType: new FormControl('', [Validators.required]),
-      nodes: new FormControl(1, [Validators.required, Validators.min(1), Validators.max(1000)])
+      nodes: new FormControl(1, [Validators.required, Validators.min(1), Validators.max(1000)]),
+      robots: new FormControl(1, [Validators.required, Validators.min(1), Validators.max(1000)]),
+      startNode: new FormControl('RANDOM', [Validators.required])
     });
 
     this.networkType.valueChanges.subscribe(res => {
       hasNodeValueConstraint(res, this.nodes);
+    });
+
+    this.nodes.valueChanges.subscribe(res => {
+      if (res) {
+        this.robots.setValue(res);
+        this.robots.setValidators([Validators.required, Validators.min(res), Validators.max(1000)]);
+      }
     });
 
   }
@@ -33,7 +42,9 @@ export class NetworkConfigurationDialogComponent implements OnInit {
   create(): void {
     this.dialogRef.close({
       networkType: this.networkType.value,
-      nodes: this.nodes.value
+      nodes: this.nodes.value,
+      robots: this.robots.value,
+      startNode: this.startNode.value
     });
   }
 
@@ -43,6 +54,14 @@ export class NetworkConfigurationDialogComponent implements OnInit {
 
   get nodes(): FormControl {
     return this.networkConfiguration.get('nodes') as FormControl;
+  }
+
+  get robots(): FormControl {
+    return this.networkConfiguration.get('robots') as FormControl;
+  }
+
+  get startNode(): FormControl {
+    return this.networkConfiguration.get('startNode') as FormControl;
   }
 
 }

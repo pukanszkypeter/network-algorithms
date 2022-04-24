@@ -17,22 +17,22 @@
       <mat-card class="operator-container shadow-lg">
 
         <div class="button-container">
-          <button mat-fab matTooltip="Next">
+          <button mat-fab matTooltip="Next" [class.disabled]="visService.startNodeID === 0" [disabled]="visService.startNodeID === 0">
             <mat-icon svgIcon="next"></mat-icon>
           </button>
         </div>
         <div class="button-container">
-          <button mat-fab matTooltip="Play">
+          <button mat-fab matTooltip="Play" [class.disabled]="visService.startNodeID === 0" [disabled]="visService.startNodeID === 0">
             <mat-icon svgIcon="play"></mat-icon>
           </button>
         </div>
         <div class="button-container">
-          <button mat-fab matTooltip="Pause">
+          <button mat-fab matTooltip="Pause" [class.disabled]="visService.startNodeID === 0" [disabled]="visService.startNodeID === 0">
             <mat-icon svgIcon="pause"></mat-icon>
           </button>
         </div>
         <div class="button-container">
-          <button mat-fab matTooltip="Reset">
+          <button mat-fab matTooltip="Reset" (click)="resetNetwork()">
             <mat-icon svgIcon="reset"></mat-icon>
           </button>
         </div>
@@ -56,14 +56,14 @@
       <div class="custom-panel shadow-lg">
         <h1>Status</h1>
         <div class="panel-value-container">
-          <span class="panel-value">--</span>
+          <span class="panel-value">{{currentStatus}}</span>
         </div>
       </div>
       <div class="custom-gap"></div>
       <div class="custom-panel shadow-lg">
         <h1>Steps</h1>
         <div class="panel-value-container">
-          <span class="panel-value">--</span>
+          <span class="panel-value">{{steps}}</span>
         </div>
       </div>
       <div class="custom-gap"></div>
@@ -75,9 +75,16 @@
       </div>
       <div class="custom-gap"></div>
       <div class="custom-panel shadow-lg">
-        <h1>Timer</h1>
+        <h1>Delay - {{delay}} ms</h1>
         <div class="panel-value-container">
-          <span class="panel-value">--</span>
+          <mat-slider
+          color="primary"
+          [step]="50"
+          [min]="200"
+          [max]="2000"
+          [(ngModel)]="delay"
+          [thumbLabel]="true"
+          ></mat-slider>
         </div>
       </div>
     </div>

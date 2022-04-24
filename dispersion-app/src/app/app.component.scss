@@ -63,6 +63,10 @@
         }
     }
 
+    .disabled {
+        background-color: rgb(32,32,32,.4);
+    }
+
 }
 
 .simulator-container {
@@ -96,8 +100,13 @@
     }
 
     .panel-value {
-        font-size: 350%;
+        font-size: 150%;
         color: #FFFFFF;
+    }
+
+    .mat-slider-horizontal {
+        width: 80%;
+        margin: auto;
     }
 }
 
