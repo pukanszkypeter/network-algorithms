@@ -55,6 +55,25 @@ nodes.append(node_5)
 nodes.append(node_6)
 
 edge_1_2 = Edge(1, 1, 2)
+edge_1_3 = Edge(2, 2, 3)
+edge_1_4 = Edge(3, 1, 4)
+edge_2_3 = Edge(4, 4, 5)
+edge_2_4 = Edge(5, 2, 5)
+edge_3_4 = Edge(6, 3, 6)
+edge_2_5 = Edge(7, 5, 6)
+
+edges = []
+edges.append(edge_1_2)
+edges.append(edge_1_3)
+edges.append(edge_1_4)
+edges.append(edge_2_3)
+edges.append(edge_2_4)
+edges.append(edge_3_4)
+edges.append(edge_2_5)
+
+
+'''
+edge_1_2 = Edge(1, 1, 2)
 edge_1_3 = Edge(2, 1, 3)
 edge_1_4 = Edge(3, 1, 4)
 edge_2_3 = Edge(4, 2, 3)
@@ -72,6 +91,7 @@ edges.append(edge_2_4)
 edges.append(edge_3_4)
 edges.append(edge_2_5)
 edges.append(edge_1_6)
+'''
 '''
 robots = []
 
