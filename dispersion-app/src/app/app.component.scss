@@ -1,0 +1,117 @@
+.custom-navbar {
+
+    height: 100px;
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+
+    img#logo {
+        margin-left: 20px;
+        width: 75px;
+        height: 75px;   
+    }
+
+    h1 {
+        color: #ffa31a;
+        opacity: 95%;
+        font-size: 180%;
+        font-weight: bolder;
+        margin: 0 0 0 15px;
+
+        .custom-border-bottom {
+            border-bottom: 2px solid;
+            width: 50%;
+            margin-top: 5px;
+            margin-left: 20px;
+            opacity: 95%;
+        }
+
+        .mat-progress-bar {
+            width: 50%;
+            margin-top: 5px;
+            margin-left: 20px;
+        }
+    }
+
+}
+
+.operator-container {
+    margin-left: 25%;
+    width: 75%;
+    height: 80vh;
+    border-radius: 20px;
+    background-color: rgb(56,56,56,.87);
+    padding: 0;
+
+    .button-container {
+        height: 16vh;
+        display: flex;
+        align-items: center;
+        width: fit-content;
+        margin: auto;
+    }
+
+    button {
+        background-color: rgb(32,32,32,.9);
+        width: 75px;
+        height: 75px;
+
+        mat-icon {
+            width: 40px;
+            height: 40px;
+        }
+    }
+
+    .disabled {
+        background-color: rgb(32,32,32,.4);
+    }
+
+}
+
+.simulator-container {
+    margin: auto;
+    width: 90%;
+    height: 80vh;
+    border-radius: 20px;
+    background-color: rgb(56,56,56,.87);
+}
+
+.custom-panel {
+    margin-right: 25%;
+    width: 75%;
+    height: 17vh;
+    border-radius: 20px;
+    background-color: rgb(56,56,56,.87);
+
+    h1 {
+        color: #FFFFFF;
+        opacity: 87%;
+        padding: 10px 0 0 20px;
+        position: absolute;
+    }
+
+    .panel-value-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .panel-value {
+        font-size: 150%;
+        color: #FFFFFF;
+    }
+
+    .mat-slider-horizontal {
+        width: 80%;
+        margin: auto;
+    }
+}
+
+.custom-gap {
+    margin-right: 25%;
+    width: 75%;
+    height: 4vh;
+}
