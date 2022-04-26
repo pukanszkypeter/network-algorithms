@@ -1,4 +1,5 @@
 from model import Node, Edge, Graph, Robot, RobotGroup
+from logger.logger import *
 
 def initialize(robotSize, start):
     robots = []
@@ -32,6 +33,46 @@ def dfs_steps(json_graph, json_robotGroup, start, robotSize):
     smallestPort = compute(robotGroup, graph)
  
     return move(robotGroup, smallestPort, graph)
+
+def dfs_test_steps(graph, start, robotGroup, robotSize):
+
+    if robotGroup is None:
+        robotGroup = initialize(graph, robotSize, start)
+
+    robotGroup = communicate(robotGroup)
+    
+    smallestPort = compute(robotGroup, graph)
+ 
+    return move(robotGroup, smallestPort, graph)
+
+
+
+def test(json_graph, start, robotGroup, robotSize, graphType):
+    graph = Graph(json_graph)
+    steps = run(graph, start, robotGroup, robotSize)
+    print('LOG')
+    result = Logger({
+        'algorithmType': 'dfs_traversal', 
+        'graphType': graphType, 
+        'nodes': len(graph.nodes), 
+        'robots': robotSize, 
+        'steps': steps
+        }).log()
+    return steps if result else None
+
+def run(graph, start, robotGroup, robotSize):
+    steps = 1
+    simulationState = dfs_test_steps(graph, start, robotGroup, robotSize)
+    graph = simulationState[1]
+    robGroup = simulationState[0]
+    while robGroup is not None and graph is not None:
+        graph = simulationState[1]
+        robGroup = simulationState[0]
+        if robGroup is not None and graph is not None:
+            simulationState = dfs_test_steps(graph, start, robGroup, robotSize)
+            steps += 1
+
+    return steps
 
 '''
 node_1 = Node(1)

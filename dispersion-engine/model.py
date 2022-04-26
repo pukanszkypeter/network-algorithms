@@ -200,7 +200,7 @@ class RobotGroup:
 
         if len(list(filter(lambda x : x.settled == False, self.robots))) == 0:
             print("Sikeres lefutás! :)")
-            return None
+            return (None, None)
 
         return (self, graph)
         
