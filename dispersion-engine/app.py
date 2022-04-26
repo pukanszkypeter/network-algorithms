@@ -26,16 +26,17 @@ def favicon():
 def runBFS():
     parameters = request.get_json()
     json_graph = parameters['graph']
+    json_robotGroup = parameters['robotGroup']
     start = parameters['start']
-    robotGroup = parameters['robotGroup']
     robotSize = parameters['robotSize']
 
     graph = {}
     for key in json_graph:
         graph[key] = json_graph[key]
 
-    step = dfs_steps(json_graph, start, robotGroup, robotSize)
-    if step == (None, None):
+    step = dfs_steps(json_graph, json_robotGroup, start, robotSize)
+    
+    if step == (None,None):
         return jsonify()
     else:
         graph = json.loads(step[1].jsonify())

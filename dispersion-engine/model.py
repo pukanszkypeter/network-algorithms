@@ -77,26 +77,44 @@ class Graph:
 
 
 class Robot:
-    def __init__(self, id):
-        self.id = id
-        
-        self.routeMemory = []
-        self.parent = None
-        self.child = 0
-        self.settled = False
-        self.treelabel = ""
+    def __init__(self, *args):
+        if isinstance(args[0], int):
+            self.id = args[0]
+            self.routeMemory = []
+            self.parent = None
+            self.child = 0
+            self.settled = False
+            self.treelabel = ""
+        else:
+            json = args[0]
+            self.id = json['id']
+            self.routeMemory = json['routeMemory']
+            self.parent = json['parent']
+            self.child = json['child']
+            self.settled = json['settled']
+            self.treelabel = json['treelabel']
     
     def settle(self, fromID):
         self.settled = True
         self.routeMemory.append(fromID)
 
 class RobotGroup:
-    def __init__(self, robots, nodeID):
-        self.robots = robots
-        self.nodeID = nodeID
-        self.settler = None
-        self.forwardState = True
-        self.routeMemory = []
+    def __init__(self, *args):
+        if len(args) > 1:
+            self.robots = args[0]
+            self.nodeID = args[1]
+            self.settler = None
+            self.forwardState = True
+            self.routeMemory = []
+        else:
+            self.robots = []
+            json = args[0]
+            for robot in json['robots']:
+                self.robots.append(Robot(robot))
+            self.nodeID = json['nodeID']
+            self.settler = Robot(json['settler'])
+            self.forwardState = json['forwardState']
+            self.routeMemory = json['routeMemory']
 
     def getRobotOnNode(self):
         for i in list(filter(lambda x : x.settled == True, self.robots)):
