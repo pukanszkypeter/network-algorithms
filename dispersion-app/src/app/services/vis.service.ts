@@ -2,6 +2,7 @@ import { EventEmitter, Injectable, Output } from '@angular/core';
 import * as vis from 'vis-network';
 import { DataSet } from "vis-data/peer/esm/vis-data";
 import { VisEdge, VisNode } from 'vis-network/declarations/network/gephiParser';
+import { SimulationState } from '../models/SimulationState';
 
 @Injectable({
   providedIn: 'root'
@@ -49,6 +50,20 @@ export class VisService {
         }
       });
     }
+  }
+
+  public updateNetwork(simulationState: SimulationState): void {
+    let visNodes = (this.network as any).nodesHandler.body.data.nodes;
+    let nodes = simulationState.graph?.nodes || [];
+    let pending = simulationState.robotGroup?.nodeID;
+    for (let i = 0; i < visNodes.length; i++) {
+      visNodes.update({id: nodes[i].id, fixed: false, color: nodes[i].id === pending ? '#FF0000' : nodes[i].occupied ? '#7CFC00' : '#673AB7'});
+    }
+  }
+
+  public endNetwork(lastNodeID: number): void {
+    let visNodes = (this.network as any).nodesHandler.body.data.nodes;
+    visNodes.update({id: lastNodeID, fixed: false, color: '#7CFC00'});
   }
 
   private initalizeData(network: string): any {

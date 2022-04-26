@@ -8,13 +8,11 @@ import { MaterialModule } from './modules/material/material.module';
 import { HttpClientModule } from '@angular/common/http';
 import { NetworkConfigurationDialogComponent } from './components/network-configuration-dialog/network-configuration-dialog.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AutomatedTesterComponent } from './components/automated-tester/automated-tester.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    NetworkConfigurationDialogComponent,
-    AutomatedTesterComponent
+    NetworkConfigurationDialogComponent
   ],
   imports: [
     BrowserModule,

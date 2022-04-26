@@ -10,14 +10,8 @@ export class AlgorithmService {
 
   constructor(private http: HttpClient) { }
 
-  stepDFS(simulationState: SimulationState): Observable<SimulationState> {
-    return this.http.post<SimulationState>(
-      'http://localhost:4200/api/dfs', simulationState
-    );
-  }
-
-  runDFSTest(simulationState: SimulationState): Observable<SimulationState> {
-    return this.http.post<SimulationState>(
+  stepDFS(simulationState: SimulationState): Observable<any> {
+    return this.http.post<any>(
       'http://localhost:4200/api/dfs', simulationState
     );
   }

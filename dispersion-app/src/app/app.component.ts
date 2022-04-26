@@ -8,7 +8,6 @@ import { Edge, Graph, Node, RobotGroup, SimulationState } from './models/Simulat
 import { AlgorithmService } from './services/algorithm.service';
 import { GraphGeneratorService } from './services/graph-generator.service';
 import { VisService } from './services/vis.service';
-import {AutomatedTesterComponent} from "./components/automated-tester/automated-tester.component";
 
 @Component({
   selector: 'app-root',
@@ -17,7 +16,7 @@ import {AutomatedTesterComponent} from "./components/automated-tester/automated-
 })
 export class AppComponent implements OnInit {
 
-  status = ['NOT CONFIGURED', 'READY', 'IN PROGRESS', 'FINISHED'];
+  status = ['NOT CONFIGURED', 'READY', 'IN PROGRESS', 'STOPPED', 'FINISHED'];
   currentStatus: string;
 
   loading = false;
@@ -25,6 +24,7 @@ export class AppComponent implements OnInit {
   simulationState: SimulationState = new SimulationState();
   delay = 750;
   steps = 0;
+  RTT = 0;
   STOPPED = false;
 
   constructor(
@@ -32,8 +32,8 @@ export class AppComponent implements OnInit {
         sanitizer: DomSanitizer,
         private graphGenerator: GraphGeneratorService,
         private algorithmService: AlgorithmService,
+        private dialog: MatDialog,
         public visService: VisService,
-        private dialog: MatDialog
   ) {
 
     for (let icon of icons) {
@@ -43,7 +43,7 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.visService.ready.subscribe(res => {
+    this.visService.ready.subscribe(() => {
       this.currentStatus = this.status[1];
       this.simulationState.graph = new Graph(
         this.visService.nodes.map(node => new Node(Number(node.id), false, [])),
@@ -51,7 +51,6 @@ export class AppComponent implements OnInit {
       );
       this.simulationState.robotGroup = null;
       this.simulationState.start = this.visService.startNodeID;
-      console.log(this.simulationState);
     });
   }
 
@@ -74,21 +73,6 @@ export class AppComponent implements OnInit {
     });
   }
 
-  runTests(): void {
-    const dialogRef = this.dialog.open(AutomatedTesterComponent, {
-      width: '20%',
-      height: '50%',
-      disableClose: true,
-      autoFocus: false
-    });
-
-    dialogRef.afterClosed().subscribe(res => {
-      if (res) {
-        this.resetNetwork();
-      }
-    });
-  }
-
   resetNetwork(): void {
     this.visService.network?.destroy();
     this.visService.network = undefined;
@@ -97,6 +81,7 @@ export class AppComponent implements OnInit {
     this.visService.startNodeID = 0;
     this.simulationState = new SimulationState();
     this.steps = 0;
+    this.RTT = 0;
     this.currentStatus = this.status[0];
   }
 
@@ -104,34 +89,42 @@ export class AppComponent implements OnInit {
 
   async playSimulator(): Promise<void> {
     this.STOPPED = false;
-    while (!this.STOPPED && !this.allRobotFinished()) {
+    while (!this.STOPPED && !this.dfsFinished()) {
       await this.stepSimulator();
       await this.sleep(this.delay);
     }
   }
 
   stopSimulator(): void {
+    this.currentStatus = this.status[3];
     this.STOPPED = true;
   }
 
   async stepSimulator(): Promise<void> {
-    if (!this.allRobotFinished()) {
+    if (!this.dfsFinished() && this.currentStatus !== this.status[4]) {
+      this.currentStatus = this.status[2];
       const start = new Date();
       this.algorithmService
         .stepDFS(this.simulationState)
         .subscribe(res => {
           const end = new Date();
+          this.RTT = end.valueOf() - start.valueOf();
           this.steps++;
-          this.updateSimulationState(res);
+          if (res.nodes && res.edges && res.robots) {
+            console.log(res);
+            this.updateSimulationState(res);
+          } else {
+            console.log('VÉGE');
+            this.endSimulationState();
+          }
         }, err => {
           console.log(err);
         });
     }
   }
 
-  allRobotFinished(): boolean {
-    const robots = this.simulationState.robotGroup?.robots;
-    return robots ? robots.filter(robot => robot.settled).length === robots.length : false;
+  dfsFinished(): boolean {
+    return this.simulationState.graph?.nodes === [] && this.simulationState.graph.edges === [] && this.simulationState.robotGroup?.robots === [];
   }
 
   sleep(ms: number): Promise<void> {
@@ -150,7 +143,13 @@ export class AppComponent implements OnInit {
       object.forwardState,
       object.routeMemory
     );
-    console.log(this.simulationState);
+    this.visService.updateNetwork(this.simulationState);
+  }
+
+  endSimulationState(): void {
+    this.currentStatus = this.status[4];
+    this.visService.endNetwork(this.simulationState.robotGroup ? this.simulationState.robotGroup.nodeID : 0);
+    this.STOPPED = true;
   }
 
 }
