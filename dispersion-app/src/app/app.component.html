@@ -17,17 +17,17 @@
       <mat-card class="operator-container shadow-lg">
 
         <div class="button-container">
-          <button mat-fab matTooltip="Next" [class.disabled]="visService.startNodeID === 0" [disabled]="visService.startNodeID === 0">
+          <button mat-fab matTooltip="Next" (click)="stepSimulator()" [class.disabled]="visService.startNodeID === 0" [disabled]="visService.startNodeID === 0">
             <mat-icon svgIcon="next"></mat-icon>
           </button>
         </div>
         <div class="button-container">
-          <button mat-fab matTooltip="Play" [class.disabled]="visService.startNodeID === 0" [disabled]="visService.startNodeID === 0">
+          <button mat-fab matTooltip="Play" (click)="playSimulator()" [class.disabled]="visService.startNodeID === 0" [disabled]="visService.startNodeID === 0">
             <mat-icon svgIcon="play"></mat-icon>
           </button>
         </div>
         <div class="button-container">
-          <button mat-fab matTooltip="Pause" [class.disabled]="visService.startNodeID === 0" [disabled]="visService.startNodeID === 0">
+          <button mat-fab matTooltip="Pause" (click)="stopSimulator()" [class.disabled]="visService.startNodeID === 0" [disabled]="visService.startNodeID === 0">
             <mat-icon svgIcon="pause"></mat-icon>
           </button>
         </div>

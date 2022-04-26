@@ -35,7 +35,7 @@ def runBFS():
         graph[key] = json_graph[key]
 
     step = dfs_steps(json_graph, json_robotGroup, start, robotSize)
-    
+
     if step == None:
         return jsonify()
     else:

@@ -157,7 +157,7 @@ class RobotGroup:
             settledRobot = self.getRobot(self.getRobotOnNode())
             print("ŐT VAN ITT: " + str(settledRobot.id) + " PARENT: " +  str(settledRobot.parent) + " CHILD: " + str(settledRobot.child) + " STATE: " + str(self.forwardState))
             if self.forwardState:
-                #print("65 AZ ITT LÉVŐ ROBOTNAK ÁTÁLLÍTOM A PARENTJÉT: " + str(settledRobot.id) + " ERRŐL: " + str(settledRobot.parent) + " ERRE: " + str(self.settler.parent))
+                # print("65 AZ ITT LÉVŐ ROBOTNAK ÁTÁLLÍTOM A PARENTJÉT: " + str(settledRobot.id) + " ERRŐL: " + str(settledRobot.parent) + " ERRE: " + str(self.settler.parent))
                 settledRobot.parent = self.settler.parent
                 self.routeMemory.append(settledRobot.parent)
                 portToCheck = self.routeMemory[len(self.routeMemory) - 1]
