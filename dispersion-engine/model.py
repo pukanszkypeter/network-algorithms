@@ -2,9 +2,12 @@ import json
 
 # Node class for graph
 class Node:
-    def __init__(self, id):
+    def __init__(self, id, occupied):
         self.id = id
-        self.occupied = False
+        if occupied is not None:
+            self.occupied = occupied
+        else:
+            self.occupied = False
         self.edges = None
 
     def initEdges(self, edges):
@@ -31,7 +34,7 @@ class Graph:
     def __init__(self, json):
         self.nodes = []
         for node in json['nodes']:
-            self.nodes.append(Node(node['id']))
+            self.nodes.append(Node(node['id'], node['occupied']))
         self.edges = []
         for edge in json['edges']:
             self.edges.append(Edge(edge['id'], edge['fromID'], edge['toID']))

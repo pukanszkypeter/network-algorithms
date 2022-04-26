@@ -8,6 +8,7 @@ import { Edge, Graph, Node, RobotGroup, SimulationState } from './models/Simulat
 import { AlgorithmService } from './services/algorithm.service';
 import { GraphGeneratorService } from './services/graph-generator.service';
 import { VisService } from './services/vis.service';
+import {AutomatedTesterComponent} from "./components/automated-tester/automated-tester.component";
 
 @Component({
   selector: 'app-root',
@@ -27,8 +28,8 @@ export class AppComponent implements OnInit {
   STOPPED = false;
 
   constructor(
-        iconRegistry: MatIconRegistry, 
-        sanitizer: DomSanitizer, 
+        iconRegistry: MatIconRegistry,
+        sanitizer: DomSanitizer,
         private graphGenerator: GraphGeneratorService,
         private algorithmService: AlgorithmService,
         public visService: VisService,
@@ -45,7 +46,7 @@ export class AppComponent implements OnInit {
     this.visService.ready.subscribe(res => {
       this.currentStatus = this.status[1];
       this.simulationState.graph = new Graph(
-        this.visService.nodes.map(node => new Node(Number(node.id), false, [])), 
+        this.visService.nodes.map(node => new Node(Number(node.id), false, [])),
         this.visService.edges.map(edge => new Edge(Number(edge.id), Number(edge.from), Number(edge.to)))
       );
       this.simulationState.robotGroup = null;
@@ -69,6 +70,21 @@ export class AppComponent implements OnInit {
         const container = document.getElementById('vis-container');
         const network = this.graphGenerator.generateGraph(res.networkType, res.nodes);
         this.visService.createNetwork(network, container ? container : new HTMLElement, res.startNode);
+      }
+    });
+  }
+
+  runTests(): void {
+    const dialogRef = this.dialog.open(AutomatedTesterComponent, {
+      width: '20%',
+      height: '50%',
+      disableClose: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(res => {
+      if (res) {
+        this.resetNetwork();
       }
     });
   }
@@ -121,7 +137,7 @@ export class AppComponent implements OnInit {
   sleep(ms: number): Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
-  
+
   updateSimulationState(object: any): void {
     this.simulationState.graph = new Graph(
       object.nodes,

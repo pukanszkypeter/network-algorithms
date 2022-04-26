@@ -23,7 +23,8 @@ def favicon():
 
 # DFS
 @app.route("/api/dfs", methods=['POST'])
-def runBFS():
+def runDFS():
+    print("asd")
     parameters = request.get_json()
     json_graph = parameters['graph']
     json_robotGroup = parameters['robotGroup']

@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  
+
   <!-- Logo -->
   <div class="custom-navbar">
     <img id="logo" src="assets/logo.png"/>
@@ -39,6 +39,12 @@
         <div class="button-container">
           <button mat-fab matTooltip="Configure" (click)="configureNetwork()">
             <mat-icon svgIcon="settings"></mat-icon>
+          </button>
+        </div>
+
+        <div class="button-container">
+          <button mat-fab matTooltip="Test" (click)="runTests()">
+            <mat-icon svgIcon="test"></mat-icon>
           </button>
         </div>
 
