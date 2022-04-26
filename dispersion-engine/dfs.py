@@ -1,6 +1,6 @@
 from model import Node, Edge, Graph, Robot, RobotGroup
 
-def initialize(graph, robotSize, start):
+def initialize(robotSize, start):
     robots = []
     for i in range(1, robotSize+1):
         robots.append(Robot(i))
@@ -18,12 +18,14 @@ def compute(robotGroup, graph):
 def move(robotGroup, smallestPort, graph):
     return robotGroup.move(smallestPort, graph)
 
-def dfs_steps(json_graph, start, robotGroup, robotSize):
+def dfs_steps(json_graph, json_robotGroup, start, robotSize):
 
     graph = Graph(json_graph)
 
-    if robotGroup is None:
-        robotGroup = initialize(graph, robotSize, start)
+    if json_robotGroup is None:
+        robotGroup = initialize(robotSize, start)
+    else:
+        robotGroup = RobotGroup(json_robotGroup)
 
     robotGroup = communicate(robotGroup)
     
