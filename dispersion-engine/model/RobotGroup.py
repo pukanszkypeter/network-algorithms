@@ -53,9 +53,10 @@ class RobotGroup:
             # print("LETELEPEDEK :) " + str(self.settler.id) + " itt: " + str(self.nodeID) + " INNEN JÖTTEM: " + str(self.settler.parent))
             self.settler.settle(self.nodeID)
             graph.getNode(self.nodeID).occupied = True
-            settledRobot = self.settler
+            settledRobot = self.settler # Ez mikor kap parentet?
+            print("FFFFAJDALOM:::"  + str(settledRobot.parent))
             self.routeMemory.append(settledRobot.parent)
-            portToCheck = self.routeMemory[len(self.routeMemory) - 1]
+            portToCheck = -1 #self.routeMemory[len(self.routeMemory) - 1]
         else:
             settledRobot = self.getRobot(self.getRobotOnNode())
             # print("ŐT VAN ITT: " + str(settledRobot.id) + " PARENT: " +  str(settledRobot.parent) + " CHILD: " + str(settledRobot.child) + " STATE: " + str(self.forwardState))
@@ -72,7 +73,7 @@ class RobotGroup:
         # print("Innen kezdem el nézni a dolgokat: " + str(portId))
 
         if settledRobot.parent == None:
-            settledRobot.parent = availablePorts[0].id
+            settledRobot.child = availablePorts[0].id
             return availablePorts[0].id
         else:
             portId += 1
