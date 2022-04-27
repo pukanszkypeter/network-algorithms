@@ -1,21 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconRegistry } from '@angular/material/icon';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTableDataSource } from '@angular/material/table';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NetworkConfigurationDialogComponent } from './components/network-configuration-dialog/network-configuration-dialog.component';
 import { icons } from './Icons';
-import {Edge, Graph, Node, Result, RobotGroup, SimulationState} from './models/SimulationState';
+import { Edge, Graph, Node, Result, Robot, RobotGroup, SimulationState } from './models/SimulationState';
 import { AlgorithmService } from './services/algorithm.service';
 import { GraphGeneratorService } from './services/graph-generator.service';
 import { VisService } from './services/vis.service';
-import {InfoDialogComponent} from "./components/info-dialog/info-dialog.component";
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit  {
 
   status = ['NOT CONFIGURED', 'READY', 'IN PROGRESS', 'STOPPED', 'FINISHED'];
   currentStatus: string;
@@ -27,6 +29,11 @@ export class AppComponent implements OnInit {
   steps = 0;
   RTT = 0;
   STOPPED = false;
+  PLAY = false;
+
+  displayedColumns: string[] = ['id', 'node', 'phase', 'status'];
+  dataSource: MatTableDataSource<Robot>;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
         iconRegistry: MatIconRegistry,
@@ -34,6 +41,7 @@ export class AppComponent implements OnInit {
         private graphGenerator: GraphGeneratorService,
         private algorithmService: AlgorithmService,
         private dialog: MatDialog,
+        private _snackBar: MatSnackBar,
         public visService: VisService,
   ) {
 
@@ -41,6 +49,7 @@ export class AppComponent implements OnInit {
       iconRegistry.addSvgIcon(icon.selector, sanitizer.bypassSecurityTrustResourceUrl(icon.path))
     }
     this.currentStatus = this.status[0];
+    this.dataSource = new MatTableDataSource();
   }
 
   ngOnInit(): void {
@@ -89,6 +98,7 @@ export class AppComponent implements OnInit {
   /** Simulator */
 
   async playSimulator(): Promise<void> {
+    this.PLAY = true;
     this.STOPPED = false;
     while (!this.STOPPED && !this.dfsFinished()) {
       await this.stepSimulator();
@@ -99,6 +109,7 @@ export class AppComponent implements OnInit {
   stopSimulator(): void {
     this.currentStatus = this.status[3];
     this.STOPPED = true;
+    this.PLAY = false;
   }
 
   async stepSimulator(): Promise<void> {
@@ -113,12 +124,15 @@ export class AppComponent implements OnInit {
           this.steps++;
           if (res.nodes && res.edges && res.robots) {
             console.log(res);
+            this.dataSource = new MatTableDataSource(res.robots);
+            setTimeout(() => {this.dataSource.paginator = this.paginator});
             this.updateSimulationState(res);
           } else {
+            this.PLAY = false;
             console.log('VÉGE');
             const result = new Result(this.visService.nodes.length, this.simulationState.robotSize, this.steps, this.graphGenerator.getCurrentGraphType());
-            console.log(result)
-            this.saveResults(result)
+            console.log(result);
+            this.saveResults(result);
             this.endSimulationState();
           }
         }, err => {
@@ -156,22 +170,15 @@ export class AppComponent implements OnInit {
     this.STOPPED = true;
   }
 
-  saveResults(result: Result): void{
+  saveResults(result: Result): void {
     this.algorithmService.saveDFS(result).subscribe(res =>  {
-      console.log(res);
-      const dialogRef = this.dialog.open(InfoDialogComponent, {
-        width: '30%',
-        height: '12%',
-        disableClose: true,
-        autoFocus: false,
-        data: {
-          success: true,
-          message: res
-        }
+      this._snackBar.open(res, 'Close', {
+        horizontalPosition: 'end',
+        verticalPosition: 'bottom',
+        duration: 3000,
+        panelClass: res === 'Log error' ? ['error-snackbar'] : ['success-snackbar']
       });
-
-      }
-    );
+    });
   }
 
 }

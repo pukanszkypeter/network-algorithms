@@ -115,3 +115,32 @@
     width: 75%;
     height: 4vh;
 }
+
+.information-row {
+    padding-bottom: 50px;
+}
+
+table {
+    width: 87.5%;
+    margin: auto;
+    background-color: rgb(56,56,56,.87);
+    
+    th, td, tr {
+        color: white;
+    }
+}
+
+.mat-paginator {
+    width: 87.5%;
+    margin: auto;
+    background-color: rgb(56,56,56,.87);
+    color: white;
+
+    ::ng-deep .mat-select-value-text {
+        color: white !important;
+    }
+
+    button {
+        color: white;
+    }
+}
