@@ -26,6 +26,10 @@ export class VisService {
         shape: "dot",
         borderWidth: 2,
         shadow: true,
+        font: {
+          size: 32,
+          color: "#ffffff",
+        },
       },
       edges: {
         width: 2,
@@ -57,7 +61,7 @@ export class VisService {
     let nodes = simulationState.graph?.nodes || [];
     let pending = simulationState.robotGroup?.nodeID;
     for (let i = 0; i < visNodes.length; i++) {
-      visNodes.update({id: nodes[i].id, fixed: false, color: nodes[i].id === pending ? '#FF0000' : nodes[i].occupied ? '#7CFC00' : '#673AB7'});
+      visNodes.update({id: nodes[i].id, label: nodes[i].id.toString(), fixed: false, color: nodes[i].id === pending ? '#FF0000' : nodes[i].occupied ? '#7CFC00' : '#673AB7'});
     }
   }
 
@@ -80,7 +84,7 @@ export class VisService {
       // Node
       const index = this.nodes.findIndex(node => node.id === Number(chunk[0]));
       if (index === -1){
-        this.nodes.push({id: Number(chunk[0]), fixed: false, color: '#673AB7'});
+        this.nodes.push({id: Number(chunk[0]), label: chunk[0], fixed: false, color: '#673AB7'});
       }
 
       // Edges
