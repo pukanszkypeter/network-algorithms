@@ -4,10 +4,11 @@ import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NetworkConfigurationDialogComponent } from './components/network-configuration-dialog/network-configuration-dialog.component';
 import { icons } from './Icons';
-import { Edge, Graph, Node, RobotGroup, SimulationState } from './models/SimulationState';
+import {Edge, Graph, Node, Result, RobotGroup, SimulationState} from './models/SimulationState';
 import { AlgorithmService } from './services/algorithm.service';
 import { GraphGeneratorService } from './services/graph-generator.service';
 import { VisService } from './services/vis.service';
+import {InfoDialogComponent} from "./components/info-dialog/info-dialog.component";
 
 @Component({
   selector: 'app-root',
@@ -115,6 +116,9 @@ export class AppComponent implements OnInit {
             this.updateSimulationState(res);
           } else {
             console.log('VÉGE');
+            const result = new Result(this.visService.nodes.length, this.simulationState.robotSize, this.steps, this.graphGenerator.getCurrentGraphType());
+            console.log(result)
+            this.saveResults(result)
             this.endSimulationState();
           }
         }, err => {
@@ -150,6 +154,24 @@ export class AppComponent implements OnInit {
     this.currentStatus = this.status[4];
     this.visService.endNetwork(this.simulationState.robotGroup ? this.simulationState.robotGroup.nodeID : 0);
     this.STOPPED = true;
+  }
+
+  saveResults(result: Result): void{
+    this.algorithmService.saveDFS(result).subscribe(res =>  {
+      console.log(res);
+      const dialogRef = this.dialog.open(InfoDialogComponent, {
+        width: '30%',
+        height: '12%',
+        disableClose: true,
+        autoFocus: false,
+        data: {
+          success: true,
+          message: res
+        }
+      });
+
+      }
+    );
   }
 
 }

@@ -67,7 +67,7 @@ export class Graph {
 
     constructor(nodes?: Node[], edges?: Edge[]) {
         this.nodes = nodes || [];
-        this.edges = edges || [];    
+        this.edges = edges || [];
     }
 
     initalize(object: any): Graph {
@@ -79,7 +79,7 @@ export class Graph {
 }
 
 export class Robot {
-    
+
     id: number;
     routeMemory: number[];
     parent: number;
@@ -131,5 +131,21 @@ export class RobotGroup {
         this.routeMemory = object.routeMemory || [];
         return this;
     }
+
+}
+
+export class Result {
+
+  nodes: number
+  robotSize: number
+  steps: number;
+  graphType: string;
+
+  constructor(nodes: number, robotSize: number, steps: number, graphType: string) {
+      this.nodes = nodes;
+      this.robotSize = robotSize;
+      this.steps = steps;
+      this.graphType = graphType;
+  }
 
 }

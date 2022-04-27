@@ -1,7 +1,7 @@
 # Webserver
 from flask import Flask, jsonify, request, render_template, send_from_directory
 import warnings, os, json
-from dfs import dfs_steps, test
+from dfs import dfs_steps, test, save
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -64,6 +64,19 @@ def runTest():
 
     step = test(json_graph, start, robotGroup, robotSize, graphType)
     return jsonify(step)
+
+
+@app.route("/api/save", methods=['POST'])
+def saveTest():
+    parameters = request.get_json()
+    nodes = parameters['nodes']
+    steps = parameters['steps']
+    robotSize = parameters['robotSize']
+    graphType = parameters['graphType']
+
+
+    saved = save(nodes, steps, robotSize, graphType)
+    return jsonify(saved)
 
 if __name__ == '__main__':
     app.run(host=HOST,debug=True,port=PORT)

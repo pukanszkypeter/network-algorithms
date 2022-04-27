@@ -74,6 +74,18 @@ def run(graph, start, robotGroup, robotSize):
 
     return steps
 
+
+def save(nodes, steps, robotSize, graphType):
+    print('LOG')
+    result = Logger({
+        'algorithmType': 'dfs_traversal', 
+        'graphType': graphType, 
+        'nodes': nodes, 
+        'robots': robotSize, 
+        'steps': steps
+        }).log()
+    return "Log was successful" if result else "Log error"
+
 '''
 node_1 = Node(1)
 node_2 = Node(2)
