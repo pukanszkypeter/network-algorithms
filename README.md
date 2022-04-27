@@ -16,7 +16,7 @@ The algorithm engine is written in [Python](https://www.python.org/) and the web
 To start the web server, follow these steps:
 
  - Install the required Python packages in **dispersion-engine** folder with: `pip install -r requirements.txt`
- - Create the `memory.sqlite` database in **dispersion-engine/db** folder and run the following schema creation code from `DDL.txt`
+ - Create the `memory.sqlite` database in **dispersion-engine/database** folder and run the following schema creation code from `DDL.txt`
  - Start the web server: `python app.py`
 
 <br>
