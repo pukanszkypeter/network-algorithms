@@ -2,7 +2,6 @@ import sqlite3
 from colorama import Fore, Style
 
 class Logger:
-
     def __init__(self, json):
         self.algorithmType = json['algorithmType']
         self.graphType = json['graphType']
@@ -29,5 +28,5 @@ class Logger:
             + self.algorithmType + ", graphType: " + self.graphType + ", nodes: " + str(self.nodes) + 
             ", robots: " + str(self.robots) + str(self.components) + ", steps: " + str(self.steps) + "}" + Style.RESET_ALL)
         finally:
-            return result
             cursor.close()
+            return result

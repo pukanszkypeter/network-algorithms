@@ -1,7 +1,7 @@
 # Webserver
 from flask import Flask, jsonify, request, render_template, send_from_directory
 import warnings, os, json
-from dfs import dfs_steps, test, save
+from algorithm.dfs import *
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -24,48 +24,23 @@ def favicon():
 # DFS
 @app.route("/api/dfs", methods=['POST'])
 def runDFS():
-    print("asd")
     parameters = request.get_json()
     json_graph = parameters['graph']
     json_robotGroup = parameters['robotGroup']
     start = parameters['start']
     robotSize = parameters['robotSize']
 
-    graph = {}
-    for key in json_graph:
-        graph[key] = json_graph[key]
-
-    step = dfs_steps(json_graph, json_robotGroup, start, robotSize)
+    result = step(json_graph, json_robotGroup, start, robotSize)
     
-    if step == (None,None):
+    if result == (None,None):
         return jsonify()
     else:
-        graph = json.loads(step[1].jsonify())
-        robotGroup = json.loads(step[0].jsonify())
+        graph = json.loads(result[1].jsonify())
+        robotGroup = json.loads(result[0].jsonify())
         graph.update(robotGroup)
         return json.dumps(graph)
 
-
-
-#Test
-
-@app.route("/api/test", methods=['POST'])
-def runTest():
-    parameters = request.get_json()
-    json_graph = parameters['graph']
-    start = parameters['start']
-    robotGroup = parameters['robotGroup']
-    robotSize = parameters['robotSize']
-    graphType = parameters['graphType']
-
-    graph = {}
-    for key in json_graph:
-        graph[key] = json_graph[key]
-
-    step = test(json_graph, start, robotGroup, robotSize, graphType)
-    return jsonify(step)
-
-
+# Log
 @app.route("/api/save", methods=['POST'])
 def saveTest():
     parameters = request.get_json()
@@ -74,9 +49,9 @@ def saveTest():
     robotSize = parameters['robotSize']
     graphType = parameters['graphType']
 
-
     saved = save(nodes, steps, robotSize, graphType)
     return jsonify(saved)
+
 
 if __name__ == '__main__':
     app.run(host=HOST,debug=True,port=PORT)
