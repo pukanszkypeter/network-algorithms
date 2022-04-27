@@ -24,3 +24,12 @@ To start the web server, follow these steps:
 ## The application (front-end)
 
 We used the [Angular](https://angular.io/) framework for the simulation interface, which you can read more about starting and using in the **dispersion-app** folder. We used the [Vis.js](https://visjs.org/) package to create and simulate graphs spectacularly.
+
+To start the application you should create first a `proxy.conf.json` file in the **dispersion-app** folder with the following lines of code: 
+
+`{
+    "/api": {
+      "target": "LOCAL_IP_ADDRESS_OF_ENGINE",
+      "secure": false
+    }
+}`
