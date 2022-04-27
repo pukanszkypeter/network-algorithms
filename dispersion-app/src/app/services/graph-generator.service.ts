@@ -7,9 +7,14 @@ import { SimpleGraph } from '../models/graph-generator/SimpleGraph';
 })
 export class GraphGeneratorService {
 
-  constructor() { }
+  currentGraphType: string;
+
+  constructor() {
+    this.currentGraphType = '';
+  }
 
   public generateGraph(type: string, nodes: number): string {
+    this.currentGraphType = type;
     switch(type) {
       case 'simpleLine': return this.generateSimpleLine(nodes);
       case 'circle': return this.generateCircleGraph(nodes);
@@ -219,5 +224,9 @@ export class GraphGeneratorService {
 
     return this.converter(graph);
   }
-  
+
+  getCurrentGraphType(){
+    return this.currentGraphType;
+  }
+
 }

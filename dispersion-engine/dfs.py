@@ -1,8 +1,7 @@
-from model import Node, Edge, Robot, RobotGroup, Graph
+from model import Node, Edge, Graph, Robot, RobotGroup
+from logger.logger import *
 
-
-
-def initialize(graph, robotSize, start):
+def initialize(robotSize, start):
     robots = []
     for i in range(1, robotSize+1):
         robots.append(Robot(i))
@@ -10,11 +9,6 @@ def initialize(graph, robotSize, start):
     robotGroup = RobotGroup(robots, start)
 
     return robotGroup
-
-
-
-    
-
 
 def communicate(robotGroup):
     return robotGroup.communicate()
@@ -25,11 +19,25 @@ def compute(robotGroup, graph):
 def move(robotGroup, smallestPort, graph):
     return robotGroup.move(smallestPort, graph)
 
-def dfs_steps(graph, start, robotGroup, robotSize):
+def dfs_steps(json_graph, json_robotGroup, start, robotSize):
+
+    graph = Graph(json_graph)
+
+    if json_robotGroup is None:
+        robotGroup = initialize(robotSize, start)
+    else:
+        robotGroup = RobotGroup(json_robotGroup)
+
+    robotGroup = communicate(robotGroup)
+    
+    smallestPort = compute(robotGroup, graph)
+ 
+    return move(robotGroup, smallestPort, graph)
+
+def dfs_test_steps(graph, start, robotGroup, robotSize):
 
     if robotGroup is None:
         robotGroup = initialize(graph, robotSize, start)
-
 
     robotGroup = communicate(robotGroup)
     
@@ -39,6 +47,46 @@ def dfs_steps(graph, start, robotGroup, robotSize):
 
 
 
+def test(json_graph, start, robotGroup, robotSize, graphType):
+    graph = Graph(json_graph)
+    steps = run(graph, start, robotGroup, robotSize)
+    print('LOG')
+    result = Logger({
+        'algorithmType': 'dfs_traversal', 
+        'graphType': graphType, 
+        'nodes': len(graph.nodes), 
+        'robots': robotSize, 
+        'steps': steps
+        }).log()
+    return steps if result else None
+
+def run(graph, start, robotGroup, robotSize):
+    steps = 1
+    simulationState = dfs_test_steps(graph, start, robotGroup, robotSize)
+    graph = simulationState[1]
+    robGroup = simulationState[0]
+    while robGroup is not None and graph is not None:
+        graph = simulationState[1]
+        robGroup = simulationState[0]
+        if robGroup is not None and graph is not None:
+            simulationState = dfs_test_steps(graph, start, robGroup, robotSize)
+            steps += 1
+
+    return steps
+
+
+def save(nodes, steps, robotSize, graphType):
+    print('LOG')
+    result = Logger({
+        'algorithmType': 'dfs_traversal', 
+        'graphType': graphType, 
+        'nodes': nodes, 
+        'robots': robotSize, 
+        'steps': steps
+        }).log()
+    return "Log was successful" if result else "Log error"
+
+'''
 node_1 = Node(1)
 node_2 = Node(2)
 node_3 = Node(3)
@@ -54,25 +102,6 @@ nodes.append(node_4)
 nodes.append(node_5)
 nodes.append(node_6)
 
-edge_1_2 = Edge(1, 1, 2)
-edge_1_3 = Edge(2, 2, 3)
-edge_1_4 = Edge(3, 1, 4)
-edge_2_3 = Edge(4, 4, 5)
-edge_2_4 = Edge(5, 2, 5)
-edge_3_4 = Edge(6, 3, 6)
-edge_2_5 = Edge(7, 5, 6)
-
-edges = []
-edges.append(edge_1_2)
-edges.append(edge_1_3)
-edges.append(edge_1_4)
-edges.append(edge_2_3)
-edges.append(edge_2_4)
-edges.append(edge_3_4)
-edges.append(edge_2_5)
-
-
-'''
 edge_1_2 = Edge(1, 1, 2)
 edge_1_3 = Edge(2, 1, 3)
 edge_1_4 = Edge(3, 1, 4)
@@ -91,36 +120,16 @@ edges.append(edge_2_4)
 edges.append(edge_3_4)
 edges.append(edge_2_5)
 edges.append(edge_1_6)
-'''
-'''
-robots = []
 
-robot_1 = Robot(1)
-robot_2 = Robot(2)
-robot_3 = Robot(3)
-robot_4 = Robot(4)
-
-robots.append(robot_1)
-robots.append(robot_2)
-robots.append(robot_3)
-robots.append(robot_4)
-
-initRobots = robots
-
-robotGroup = RobotGroup(robots)
-'''
 graph = Graph(nodes, edges)
 
 for n in graph.nodes:
     n.initEdges([x for x in graph.edges if x.fromID == n.id or x.toID == n.id])
-'''
-for n in graph.nodes:
-    for e in graph.getNodePorts(n.id):
-        print("NODE: " + str(n.id) + "EDGE: " + str(e.id) + " PORTJA: " + str(graph.getPortNumber(n.id,e.id)))
 
-'''
 
 state = None
 state = dfs_steps(graph, 1, state, 6 )
+
 while state != None:
     state = dfs_steps(graph, 1, state, 6 )
+'''

@@ -1,19 +1,18 @@
 import json
 
-from matplotlib.style import available
-
 # Node class for graph
 class Node:
-    def __init__(self, id):
+    def __init__(self, id, occupied):
         self.id = id
+        if occupied is not None:
+            self.occupied = occupied
+        else:
+            self.occupied = False
         self.edges = None
 
     def initEdges(self, edges):
         self.edges = edges
 
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, 
-            sort_keys=True, indent=4)
 
 # Edge class for graph
 class Port:
@@ -22,28 +21,28 @@ class Port:
         self.fromID = fromID
         self.toID = toID
 
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, 
-            sort_keys=True, indent=4)
-
 # Edge class for graph
 class Edge:
     def __init__(self, id, fromID, toID):
         self.id = id
         self.fromID = fromID
         self.toID = toID
-        #self.portA = Port(self.id, self.fromID, self.toID) #TODO: port id itt még nem jó, hiszen node-onként kell 1-től indulnia
-        #self.portB = Port(self.id, self.toID, self.fromID)
 
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, 
-            sort_keys=True, indent=4)
 
 # Graph class
 class Graph:
-    def __init__(self, nodes, edges):
-        self.nodes = nodes
-        self.edges = edges
+    def __init__(self, json):
+        self.nodes = []
+        for node in json['nodes']:
+            self.nodes.append(Node(node['id'], node['occupied']))
+        self.edges = []
+        for edge in json['edges']:
+            self.edges.append(Edge(edge['id'], edge['fromID'], edge['toID']))
+        for node in self.nodes:
+            node.initEdges([x for x in self.edges if x.fromID == node.id or x.toID == node.id])
+
+    def getNode(self, nodeId):
+        return list(filter(lambda x : x.id == nodeId, self.nodes))[0]
 
     def getNodeDegree(self, nodeId):
         return len(list(filter(lambda x : x.fromID == nodeId or x.toID == nodeId, self.edges)))
@@ -66,31 +65,59 @@ class Graph:
     def getEdge(self, edgeId):
         return list(filter(lambda x : x.id == edgeId, self.edges))[0]
 
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, 
-            sort_keys=True, indent=4)
+    def jsonify(self):
+        nodes = []
+        for node in self.nodes:
+            node_edges = []
+            for node_edge in node.edges:
+                node_edges.append({'id': node_edge.id, 'fromID': node_edge.fromID, 'toID': node_edge.toID})  
+            nodes.append({'id': node.id, 'occupied': node.occupied, 'edges': node_edges})
+        edges = []
+        for edge in self.edges:
+            edges.append({'id': edge.id, 'fromID': edge.fromID, 'toID': edge.toID})
+        
+        return json.dumps({'nodes': nodes, 'edges': edges})
 
 
 class Robot:
-    def __init__(self, id):
-        self.id = id
-        
-        self.routeMemory = []
-        self.parent = None
-        self.child = 0
-        self.settled = False
-        self.treelabel = ""
+    def __init__(self, *args):
+        if isinstance(args[0], int):
+            self.id = args[0]
+            self.routeMemory = []
+            self.parent = None
+            self.child = 0
+            self.settled = False
+            self.treelabel = ""
+        else:
+            json = args[0]
+            self.id = json['id']
+            self.routeMemory = json['routeMemory']
+            self.parent = json['parent']
+            self.child = json['child']
+            self.settled = json['settled']
+            self.treelabel = json['treelabel']
     
     def settle(self, fromID):
         self.settled = True
         self.routeMemory.append(fromID)
 
 class RobotGroup:
-    def __init__(self, robots, nodeID):
-        self.robots = robots
-        self.nodeID = nodeID
-        self.settler = None
-        self.forwardState = True
+    def __init__(self, *args):
+        if len(args) > 1:
+            self.robots = args[0]
+            self.nodeID = args[1]
+            self.settler = None
+            self.forwardState = True
+            self.routeMemory = []
+        else:
+            self.robots = []
+            json = args[0]
+            for robot in json['robots']:
+                self.robots.append(Robot(robot))
+            self.nodeID = json['nodeID']
+            self.settler = Robot(json['settler'])
+            self.forwardState = json['forwardState']
+            self.routeMemory = json['routeMemory']
 
     def getRobotOnNode(self):
         for i in list(filter(lambda x : x.settled == True, self.robots)):
@@ -116,79 +143,75 @@ class RobotGroup:
         return self
 
     def compute(self, graph):
-        
         availablePorts = graph.getNodePorts(self.nodeID)
 
-        print("--------NODE: [[ " + str(self.nodeID) + " ]] PATHS: " + str([a.id for a in availablePorts]))
+        portToCheck = 0
 
-        oldparent = None
+        print("--------NODE: [[ " + str(self.nodeID) + " ]] PATHS: " + str([a.id for a in availablePorts]))
         
         if -1 == self.getRobotOnNode():
             print("LETELEPEDEK :) " + str(self.settler.id) + " itt: " + str(self.nodeID) + " INNEN JÖTTEM: " + str(self.settler.parent))
             self.settler.settle(self.nodeID)
+            graph.getNode(self.nodeID).occupied = True
             settledRobot = self.settler
-            oldparent = settledRobot.parent
+            self.routeMemory.append(settledRobot.parent)
+            portToCheck = self.routeMemory[len(self.routeMemory) - 1]
         else:
             settledRobot = self.getRobot(self.getRobotOnNode())
-            print("ŐT VAN ITT: " + str(settledRobot.id) + " PARENT: " +  str(settledRobot.parent) + " CHILD: " + str(settledRobot.child))
-            oldparent = settledRobot.child #ez a +1 nemtom miért kell, de ha nincs itt, akkor nem jó :)
+            print("ŐT VAN ITT: " + str(settledRobot.id) + " PARENT: " +  str(settledRobot.parent) + " CHILD: " + str(settledRobot.child) + " STATE: " + str(self.forwardState))
             if self.forwardState:
+                # print("65 AZ ITT LÉVŐ ROBOTNAK ÁTÁLLÍTOM A PARENTJÉT: " + str(settledRobot.id) + " ERRŐL: " + str(settledRobot.parent) + " ERRE: " + str(self.settler.parent))
                 settledRobot.parent = self.settler.parent
+                self.routeMemory.append(settledRobot.parent)
+                portToCheck = self.routeMemory[len(self.routeMemory) - 1]
+            else:
+                portToCheck = settledRobot.child
 
-        portId = oldparent
-        
+        portId = portToCheck
+
+        print("Innen kezdem el nézni a dolgokat: " + str(portId))
+
         if settledRobot.parent == None:
             settledRobot.parent = availablePorts[0].id
             return availablePorts[0].id
         else:
-            while portId < len(availablePorts):
-                print("while: " + str(portId) + " VS " + str(settledRobot.parent) + " | " + str(settledRobot.child))
-                if self.forwardState == False:
-                    if settledRobot.child >= portId:
-                        portId += 1
-                    else:
-                        break
-                else:
-                    if settledRobot.parent >= portId:
-                        portId += 1
-                    else:
-                        break
-                #if (self.forwardState == False and settledRobot.child >= portId) or settledRobot.parent >= portId:
-                #    portId += 1
-                #else:
-                #    break
-            if len(availablePorts) <= portId:
-                print("BACKTRACK! " + str(settledRobot.parent) + " ID:_ " + str(settledRobot.id))
+            portId += 1
+            print("növelés után: " + str(len(availablePorts)) + "VS" + str(portId))
+            if len(availablePorts) <= portId: #BACKTRACK
+                backtrackPort = self.routeMemory.pop()
+                print("BACKTRACK: " + str(backtrackPort))
                 self.forwardState = False
-                settledRobot.child = settledRobot.parent
-                return availablePorts[settledRobot.parent].id
-            print("FORWARD: " + str(availablePorts[portId].id))
-            self.forwardState = True
-            settledRobot.child = portId
-            return availablePorts[portId].id
+                settledRobot.child = backtrackPort
+                return availablePorts[backtrackPort].id
+            else: #FORWARD
+                print("FORWARD: " + str(availablePorts[portId].id))
+                self.forwardState = True
+                settledRobot.child = portId
+                return availablePorts[portId].id
 
     def move(self, edgeId, graph):
         choosenRoute = graph.getEdge(edgeId)
 
         if choosenRoute.fromID == self.nodeID:
-            if self.forwardState or self.getSettler().parent == None:
+            if self.forwardState:
                 self.getSettler().parent = graph.getPortNumber(choosenRoute.toID, choosenRoute.id)
-                print(str(self.getSettler().id) + " BEÁLLÍTOM A PARENTET: " + str(self.getSettler().parent) + " | " + str(self.getSettler().child))
-            #self.getSettler().child = graph.getPortNumber(choosenRoute.fromID, choosenRoute.id)
             self.nodeID = choosenRoute.toID
         else:
-            if self.forwardState or self.getSettler().parent == None:
+            if self.forwardState:
                 self.getSettler().parent = graph.getPortNumber(choosenRoute.fromID, choosenRoute.id)
-                print(str(self.getSettler().id) + "BEÁLLÍTOM A PARENTET: " + str(self.getSettler().parent))
-            #self.getSettler().child = graph.getPortNumber(choosenRoute.toID, choosenRoute.id)
             self.nodeID = choosenRoute.fromID
-        
+
         if len(list(filter(lambda x : x.settled == False, self.robots))) == 0:
             print("Sikeres lefutás! :)")
-            return None
+            return (None, None)
 
-        return self
+        return (self, graph)
         
-    def toJSON(self):
-        return json.dumps(self, default=lambda o: o.__dict__, 
-            sort_keys=True, indent=4)
+    def jsonify(self):
+        robots = []
+        for robot in self.robots:
+            robots.append({'id': robot.id, 'routeMemory': robot.routeMemory, 'parent': robot.parent, 'child': robot.child, 'settled': robot.settled, 'treelabel': robot.treelabel})
+        
+        settler = {'id': self.settler.id, 'routeMemory': self.settler.routeMemory, 'parent': self.settler.parent, 'child': self.settler.child, 'settled': self.settler.settled, 'treelabel': self.settler.treelabel}
+        
+        return json.dumps({'robots': robots, 'nodeID': self.nodeID, 'settler': settler, 'forwardState': self.forwardState, 'routeMemory': self.routeMemory})

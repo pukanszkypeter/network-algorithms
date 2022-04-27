@@ -23,6 +23,8 @@ export class NetworkConfigurationDialogComponent implements OnInit {
       startNode: new FormControl('RANDOM', [Validators.required])
     });
 
+    this.networkConfiguration.get('robots')?.disable();
+
     this.networkType.valueChanges.subscribe(res => {
       hasNodeValueConstraint(res, this.nodes);
     });
@@ -43,7 +45,6 @@ export class NetworkConfigurationDialogComponent implements OnInit {
     this.dialogRef.close({
       networkType: this.networkType.value,
       nodes: this.nodes.value,
-      robots: this.robots.value,
       startNode: this.startNode.value
     });
   }

@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  
+
   <!-- Logo -->
   <div class="custom-navbar">
     <img id="logo" src="assets/logo.png"/>
@@ -17,17 +17,17 @@
       <mat-card class="operator-container shadow-lg">
 
         <div class="button-container">
-          <button mat-fab matTooltip="Next" [class.disabled]="visService.startNodeID === 0" [disabled]="visService.startNodeID === 0">
+          <button mat-fab matTooltip="Next" (click)="stepSimulator()" [class.disabled]="visService.startNodeID === 0 || this.currentStatus === 'FINISHED'" [disabled]="visService.startNodeID === 0 || this.currentStatus === 'FINISHED'">
             <mat-icon svgIcon="next"></mat-icon>
           </button>
         </div>
         <div class="button-container">
-          <button mat-fab matTooltip="Play" [class.disabled]="visService.startNodeID === 0" [disabled]="visService.startNodeID === 0">
+          <button mat-fab matTooltip="Play" (click)="playSimulator()" [class.disabled]="visService.startNodeID === 0 || this.currentStatus === 'FINISHED'" [disabled]="visService.startNodeID === 0 || this.currentStatus === 'FINISHED'">
             <mat-icon svgIcon="play"></mat-icon>
           </button>
         </div>
         <div class="button-container">
-          <button mat-fab matTooltip="Pause" [class.disabled]="visService.startNodeID === 0" [disabled]="visService.startNodeID === 0">
+          <button mat-fab matTooltip="Pause" (click)="stopSimulator()" [class.disabled]="visService.startNodeID === 0 || this.currentStatus === 'FINISHED'" [disabled]="visService.startNodeID === 0 || this.currentStatus === 'FINISHED'">
             <mat-icon svgIcon="pause"></mat-icon>
           </button>
         </div>
@@ -70,7 +70,7 @@
       <div class="custom-panel shadow-lg">
         <h1>Runtime</h1>
         <div class="panel-value-container">
-          <span class="panel-value">--</span>
+          <span class="panel-value">{{RTT}} ms</span>
         </div>
       </div>
       <div class="custom-gap"></div>

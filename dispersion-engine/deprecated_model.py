@@ -91,7 +91,6 @@ class RobotGroup:
         self.nodeID = nodeID
         self.settler = None
         self.forwardState = True
-        self.routeMemory = []
 
     def getRobotOnNode(self):
         for i in list(filter(lambda x : x.settled == True, self.robots)):
@@ -117,63 +116,73 @@ class RobotGroup:
         return self
 
     def compute(self, graph):
+        
         availablePorts = graph.getNodePorts(self.nodeID)
 
-        portToCheck = 0
-
         print("--------NODE: [[ " + str(self.nodeID) + " ]] PATHS: " + str([a.id for a in availablePorts]))
+
+        oldparent = None
         
         if -1 == self.getRobotOnNode():
             print("LETELEPEDEK :) " + str(self.settler.id) + " itt: " + str(self.nodeID) + " INNEN JÖTTEM: " + str(self.settler.parent))
             self.settler.settle(self.nodeID)
             settledRobot = self.settler
-            self.routeMemory.append(settledRobot.parent)
-            portToCheck = self.routeMemory[len(self.routeMemory) - 1]
+            oldparent = settledRobot.parent
         else:
             settledRobot = self.getRobot(self.getRobotOnNode())
-            print("ŐT VAN ITT: " + str(settledRobot.id) + " PARENT: " +  str(settledRobot.parent) + " CHILD: " + str(settledRobot.child) + " STATE: " + str(self.forwardState))
+            print("ŐT VAN ITT: " + str(settledRobot.id) + " PARENT: " +  str(settledRobot.parent) + " CHILD: " + str(settledRobot.child))
+            oldparent = settledRobot.child #ez a +1 nemtom miért kell, de ha nincs itt, akkor nem jó :)
             if self.forwardState:
-                #print("65 AZ ITT LÉVŐ ROBOTNAK ÁTÁLLÍTOM A PARENTJÉT: " + str(settledRobot.id) + " ERRŐL: " + str(settledRobot.parent) + " ERRE: " + str(self.settler.parent))
                 settledRobot.parent = self.settler.parent
-                self.routeMemory.append(settledRobot.parent)
-                portToCheck = self.routeMemory[len(self.routeMemory) - 1]
-            else:
-                portToCheck = settledRobot.child
 
-        portId = portToCheck
-
-        print("Innen kezdem el nézni a dolgokat: " + str(portId))
-
+        portId = oldparent
+        
         if settledRobot.parent == None:
             settledRobot.parent = availablePorts[0].id
             return availablePorts[0].id
         else:
-            portId += 1
-            print("növelés után: " + str(len(availablePorts)) + "VS" + str(portId))
-            if len(availablePorts) <= portId: #BACKTRACK
-                backtrackPort = self.routeMemory.pop()
-                print("BACKTRACK: " + str(backtrackPort))
+            while portId < len(availablePorts):
+                print("while: " + str(portId) + " VS " + str(settledRobot.parent) + " | " + str(settledRobot.child))
+                if self.forwardState == False:
+                    if settledRobot.child >= portId:
+                        portId += 1
+                    else:
+                        break
+                else:
+                    if settledRobot.parent >= portId:
+                        portId += 1
+                    else:
+                        break
+                #if (self.forwardState == False and settledRobot.child >= portId) or settledRobot.parent >= portId:
+                #    portId += 1
+                #else:
+                #    break
+            if len(availablePorts) <= portId:
+                print("BACKTRACK! " + str(settledRobot.parent) + " ID:_ " + str(settledRobot.id))
                 self.forwardState = False
-                settledRobot.child = backtrackPort
-                return availablePorts[backtrackPort].id
-            else: #FORWARD
-                print("FORWARD: " + str(availablePorts[portId].id))
-                self.forwardState = True
-                settledRobot.child = portId
-                return availablePorts[portId].id
+                settledRobot.child = settledRobot.parent
+                return availablePorts[settledRobot.parent].id
+            print("FORWARD: " + str(availablePorts[portId].id))
+            self.forwardState = True
+            settledRobot.child = portId
+            return availablePorts[portId].id
 
     def move(self, edgeId, graph):
         choosenRoute = graph.getEdge(edgeId)
 
         if choosenRoute.fromID == self.nodeID:
-            if self.forwardState:
+            if self.forwardState or self.getSettler().parent == None:
                 self.getSettler().parent = graph.getPortNumber(choosenRoute.toID, choosenRoute.id)
+                print(str(self.getSettler().id) + " BEÁLLÍTOM A PARENTET: " + str(self.getSettler().parent) + " | " + str(self.getSettler().child))
+            #self.getSettler().child = graph.getPortNumber(choosenRoute.fromID, choosenRoute.id)
             self.nodeID = choosenRoute.toID
         else:
-            if self.forwardState:
+            if self.forwardState or self.getSettler().parent == None:
                 self.getSettler().parent = graph.getPortNumber(choosenRoute.fromID, choosenRoute.id)
+                print(str(self.getSettler().id) + "BEÁLLÍTOM A PARENTET: " + str(self.getSettler().parent))
+            #self.getSettler().child = graph.getPortNumber(choosenRoute.toID, choosenRoute.id)
             self.nodeID = choosenRoute.fromID
-
+        
         if len(list(filter(lambda x : x.settled == False, self.robots))) == 0:
             print("Sikeres lefutás! :)")
             return None
