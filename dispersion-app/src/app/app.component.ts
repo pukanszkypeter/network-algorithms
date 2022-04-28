@@ -131,6 +131,12 @@ export class AppComponent implements OnInit  {
             this.PLAY = false;
             console.log('VÉGE');
             const result = new Result(this.visService.nodes.length, this.simulationState.robotSize, this.steps, this.graphGenerator.getCurrentGraphType());
+            const notSettledRobots = this.simulationState.robotGroup?.robots.filter(robot => !robot.settled);
+            if (notSettledRobots) {
+              notSettledRobots[0].settled = true;
+              const nodeID = this.simulationState.robotGroup?.nodeID;
+              notSettledRobots[0].routeMemory .push(nodeID || 0);
+            }
             console.log(result);
             this.saveResults(result);
             this.endSimulationState();

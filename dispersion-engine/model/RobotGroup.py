@@ -54,7 +54,7 @@ class RobotGroup:
             self.settler.settle(self.nodeID)
             graph.getNode(self.nodeID).occupied = True
             settledRobot = self.settler # Ez mikor kap parentet?
-            print("FFFFAJDALOM:::"  + str(settledRobot.parent))
+            # print("FFFFAJDALOM:::"  + str(settledRobot.parent))
             self.routeMemory.append(settledRobot.parent)
             portToCheck = -1 #self.routeMemory[len(self.routeMemory) - 1]
         else:
